@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Buffs;
 using UnityEngine;
 
@@ -12,8 +13,11 @@ public class Character : MonoBehaviour
     [SerializeField] private float health;
     [SerializeField] private float maxHealth;
     [SerializeField] private float speed;
+    
+    private bool _isDead;
+    private Camera _followCamera;
 
-    private bool _dead;
+    private Transform _transform;
     
     public List<Buff> Buffs;
     
@@ -23,18 +27,40 @@ public class Character : MonoBehaviour
 
     private void Awake()
     {
+        _transform = transform;
+        
+        _isDead = true;
+        _followCamera = GetComponentInChildren<Camera>();
         Buffs = new();
         
         // test
         ApplyBuff(new RegenerationBuff(.25f, 5));
     }
 
+    public void Spawn(Vector3 spawnPos)
+    {
+        _isDead = false;
+
+        //_transform.position = _followCamera.transform.position;
+    }
+
+    public void Die()
+    {
+        _isDead = true;
+        Buffs.Clear();
+    }
+    
     private void Start()
     {
         MaxHealth = 100;
         Health = MaxHealth / 4;
+        
+        // test
         //StartCoroutine(SmoothHealthRegeneration());
+        Spawn(Vector3.zero);
+        
         StartCoroutine(TickBuffs());
+        //Task.Run(TickBuffs);
     }
 
     public void ApplyBuff(Buff buff)
@@ -44,13 +70,15 @@ public class Character : MonoBehaviour
         Buffs.Add(buff);
     }
     
+    // mb use coroutine?
     private IEnumerator TickBuffs()
     {
         const float tickDelay = 0.1f;
         
-        while (!_dead)
+        while (!_isDead)
         {
             yield return new WaitForSeconds(tickDelay);
+            
             foreach (var buff in Buffs)
             {
                 buff.RemainingTime -= tickDelay;
