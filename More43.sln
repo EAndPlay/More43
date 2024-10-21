@@ -3,6 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{C449D945-0A7B-C00B-F6C0-05849C27BAB4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{562BF273-BF09-66F0-548E-4F37A5A97A5E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NavMeshComponentsEditor", "NavMeshComponentsEditor.csproj", "{8187942D-B333-82B3-20FC-F268BAF31903}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Textus.SerializeReferenceUI", "Textus.SerializeReferenceUI.csproj", "{481D6B12-F572-3773-0075-A61676B30F53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NavMeshComponents", "NavMeshComponents.csproj", "{E510A580-4FF3-901D-FD19-84C61BC06C30}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +21,22 @@ Global
 		{C449D945-0A7B-C00B-F6C0-05849C27BAB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C449D945-0A7B-C00B-F6C0-05849C27BAB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C449D945-0A7B-C00B-F6C0-05849C27BAB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{562BF273-BF09-66F0-548E-4F37A5A97A5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{562BF273-BF09-66F0-548E-4F37A5A97A5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{562BF273-BF09-66F0-548E-4F37A5A97A5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{562BF273-BF09-66F0-548E-4F37A5A97A5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8187942D-B333-82B3-20FC-F268BAF31903}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8187942D-B333-82B3-20FC-F268BAF31903}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8187942D-B333-82B3-20FC-F268BAF31903}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8187942D-B333-82B3-20FC-F268BAF31903}.Release|Any CPU.Build.0 = Release|Any CPU
+		{481D6B12-F572-3773-0075-A61676B30F53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{481D6B12-F572-3773-0075-A61676B30F53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{481D6B12-F572-3773-0075-A61676B30F53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{481D6B12-F572-3773-0075-A61676B30F53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E510A580-4FF3-901D-FD19-84C61BC06C30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E510A580-4FF3-901D-FD19-84C61BC06C30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E510A580-4FF3-901D-FD19-84C61BC06C30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E510A580-4FF3-901D-FD19-84C61BC06C30}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

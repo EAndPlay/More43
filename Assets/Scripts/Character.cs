@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Buffs;
 using UnityEngine;
 
-public class Character : MonoBehaviour
+public class Character : MonoBehaviour, IDamageable
 {
     //public object Class;
 
@@ -20,10 +18,40 @@ public class Character : MonoBehaviour
     private Transform _transform;
     
     public List<Buff> Buffs;
-    
+
     public event Action<float> HealthChanged;
     public event Action<float> MaxHealthChanged;
     public event Action<float> SpeedChanged;
+    
+    public float Health
+    {
+        get => health;
+        set
+        {
+            health = value;
+            HealthChanged?.Invoke(value);
+        }
+    }
+    
+    public float MaxHealth
+    {
+        get => maxHealth;
+        set
+        {
+            maxHealth = value;
+            MaxHealthChanged?.Invoke(value);
+        }
+    }
+    
+    public float Speed
+    {
+        get => speed;
+        set
+        {
+            speed = value;
+            SpeedChanged?.Invoke(value);
+        }
+    }
 
     private void Awake()
     {
@@ -35,6 +63,18 @@ public class Character : MonoBehaviour
         
         // test
         ApplyBuff(new RegenerationBuff(.25f, 5));
+    }
+    
+    private void Start()
+    {
+        Health = MaxHealth = 100;
+        
+        // test
+        //StartCoroutine(SmoothHealthRegeneration());
+        Spawn(Vector3.zero);
+        
+        StartCoroutine(TickBuffs());
+        //Task.Run(TickBuffs);
     }
 
     public void Spawn(Vector3 spawnPos)
@@ -48,19 +88,6 @@ public class Character : MonoBehaviour
     {
         _isDead = true;
         Buffs.Clear();
-    }
-    
-    private void Start()
-    {
-        MaxHealth = 100;
-        Health = MaxHealth / 4;
-        
-        // test
-        //StartCoroutine(SmoothHealthRegeneration());
-        Spawn(Vector3.zero);
-        
-        StartCoroutine(TickBuffs());
-        //Task.Run(TickBuffs);
     }
 
     public void ApplyBuff(Buff buff)
@@ -109,36 +136,6 @@ public class Character : MonoBehaviour
                 i = 0.1f;
             Health += i;
             yield return new WaitForSeconds(0.01f);
-        }
-    }
-
-    public float Health
-    {
-        get => health;
-        set
-        {
-            health = value;
-            HealthChanged?.Invoke(value);
-        }
-    }
-    
-    public float MaxHealth
-    {
-        get => maxHealth;
-        set
-        {
-            maxHealth = value;
-            MaxHealthChanged?.Invoke(value);
-        }
-    }
-    
-    public float Speed
-    {
-        get => speed;
-        set
-        {
-            speed = value;
-            SpeedChanged?.Invoke(value);
         }
     }
 }

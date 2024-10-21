@@ -17,6 +17,8 @@ public class Item : ICloneable
 
     public string Name; // $name
 
+    public bool IsDroppable;
+
     private Item(ItemId id, int stack)
     {
         Id = id;

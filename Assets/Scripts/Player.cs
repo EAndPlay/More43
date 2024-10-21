@@ -2,7 +2,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(HUD))]
-public class Player : MonoBehaviour
+public sealed class Player : MonoBehaviour
 {
     public Character Character;
     private HUD _hud;
