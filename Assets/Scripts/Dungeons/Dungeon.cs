@@ -80,6 +80,11 @@ namespace Dungeons
 
                 var newRoom = Instantiate(rooms[randomRoom].room, new Vector3(i * offset.x, 0, -j * offset.y),
                     Quaternion.identity, transform).GetComponent<DungeonRoom>();
+                if (i == 0 && j == 0)
+                {
+                    spawnPoint = newRoom.spawnPoint;
+                    Debug.Log($"SpawnPoint set");
+                }
                 newRoom.Initialize(currentCell.Status);
                 newRoom.name = new StringBuilder(" ").Append(i).Append("-").Append(j).ToString();
             }

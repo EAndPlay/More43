@@ -5,7 +5,7 @@ namespace Dungeons
     public class DungeonRoom : MonoBehaviour
     {
         // used for first enter to dung
-        [SerializeField] private GameObject spawnPoint;
+        public GameObject spawnPoint;
 
         [Header("For generation")]
         [SerializeField] private GameObject[] walls;
