@@ -1,11 +1,12 @@
 ﻿using System;
 using UnityEngine;
 
-public abstract class Weapon : MonoBehaviour
+public abstract class Weapon : MonoObject
 {
     public float Damage;
     public int CriticalChance;
     public float CriticalMultiplier;
+    public float AttackRate;
     // private void OnTriggerEnter(Collider other)
     // {
     //     //EnemyEntity mob;

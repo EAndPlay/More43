@@ -5,10 +5,10 @@ public class InGameCamera : MonoBehaviour
 {
     public float CameraDistance = 0.8f;
     public float SensitivityMulti = 5f;
+    public static Camera mainCamera;
     [SerializeField] private float distance = 10f;
     [SerializeField] private float distanceMulti;
     [SerializeField] private float distanceOffsetMulti;
-    [SerializeField] private Camera mainCamera;
     [SerializeField] private Transform targetTransform;
     private Transform _cameraTransform;
 
@@ -20,6 +20,8 @@ public class InGameCamera : MonoBehaviour
 
     private void MoveCamera()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         var eulerAngles = _cameraTransform.eulerAngles;
         var y = eulerAngles.y;
         //this.distanceOffsetMulti = (cameraDistance * (200f - _camera.fieldOfView)) / 150f;
@@ -30,8 +32,6 @@ public class InGameCamera : MonoBehaviour
         _cameraTransform.position = targetTransform.position + Vector3.up * (-(0.6f - CameraDistance) * 2f);
         var pos = _cameraTransform.position;// += Vector3.up * (-(0.6f - CameraDistance) * 2);
 
-        //Cursor.lockState = CursorLockMode.Locked;
-        //Cursor.visible = false;
 
         var deltaX = Input.GetAxis("Mouse X") * SensitivityMulti;
         var deltaY = -Input.GetAxis("Mouse Y") * SensitivityMulti;

@@ -17,6 +17,8 @@ public class PlayerMovement : MonoBehaviour
     private Character _character;
     private Rigidbody _rigidBody;
 
+    private float _dashDelay;
+
     private void Awake()
     {
         _cameraTransform = _camera.transform;
@@ -25,8 +27,9 @@ public class PlayerMovement : MonoBehaviour
         _rigidBody = GetComponent<Rigidbody>();
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
+        _dashDelay -= Time.fixedDeltaTime;
         var lookVector = _cameraTransform.forward;
         lookVector = new Vector3(lookVector.x, 0, lookVector.z);
         //
@@ -99,10 +102,20 @@ public class PlayerMovement : MonoBehaviour
         //_character.transform.LookAt(_character.transform.position + moveVector);
         moveVector *= speed;
 
-        var velocityCopy = _rigidBody.velocity;
-        _rigidBody.velocity = new Vector3(moveVector.x, velocityCopy.y, moveVector.z);
         //transform.Translate(moveVector * Time.deltaTime);
 
+        if (Input.GetKeyDown(KeyCode.Space) && _dashDelay >= 1)
+        {
+            _dashDelay = 0;
+            _rigidBody.position += moveVector * 50;
+        }
+        //_rigidBody.velocity += Vector3.up * jumpForce;
+        //_rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange);
+        
+        var velocityCopy = _rigidBody.velocity;
+        _rigidBody.velocity = new Vector3(moveVector.x, velocityCopy.y, moveVector.z);
+
+        
         // Vector3 getGlobaleFacingVector3(float resultAngle)
         // {
         //     float num = -resultAngle + 90f;
@@ -163,10 +176,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-            //_rigidBody.velocity += Vector3.up * jumpForce;
-            _rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange);
-        
         if (_rigidBody.velocity.y < 0)
         {
             _rigidBody.velocity += Vector3.up * (Physics.gravity.y * Time.deltaTime);

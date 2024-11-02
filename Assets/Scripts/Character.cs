@@ -3,45 +3,23 @@ using System.Collections;
 using System.Collections.Generic;
 using Buffs;
 using UnityEngine;
+using Weapons;
 
-public class Character : MonoBehaviour, IDamageable
+public class Character : AliveEntity
 {
     //public object Class;
 
-    [SerializeField] private float health;
-    [SerializeField] private float maxHealth;
     [SerializeField] private float speed;
     
-    private bool _isDead;
     private Camera _followCamera;
+    private List<Buff> _buffs;
+    private bool _attackHolded;
 
-    private Transform _transform;
-    
-    public List<Buff> Buffs;
+    public Weapon CurrentWeapon;
+    public Weapon PrimaryWeapon;
+    public Weapon SecondaryWeapon;
 
-    public event Action<float> HealthChanged;
-    public event Action<float> MaxHealthChanged;
     public event Action<float> SpeedChanged;
-    
-    public float Health
-    {
-        get => health;
-        set
-        {
-            health = value;
-            HealthChanged?.Invoke(value);
-        }
-    }
-    
-    public float MaxHealth
-    {
-        get => maxHealth;
-        set
-        {
-            maxHealth = value;
-            MaxHealthChanged?.Invoke(value);
-        }
-    }
     
     public float Speed
     {
@@ -55,11 +33,11 @@ public class Character : MonoBehaviour, IDamageable
 
     private void Awake()
     {
-        _transform = transform;
+        IsDead = false;
+        CurrentWeapon = PrimaryWeapon = GetComponentInChildren<SwordWeapon>();
         
-        _isDead = true;
         _followCamera = GetComponentInChildren<Camera>();
-        Buffs = new();
+        _buffs = new();
         
         // test
         ApplyBuff(new RegenerationBuff(.25f, 5));
@@ -68,10 +46,9 @@ public class Character : MonoBehaviour, IDamageable
     private void Start()
     {
         Health = MaxHealth = 100;
-        
         // test
         //StartCoroutine(SmoothHealthRegeneration());
-        Spawn(Vector3.zero);
+        //Spawn(Vector3.zero);
         
         StartCoroutine(TickBuffs());
         //Task.Run(TickBuffs);
@@ -79,22 +56,22 @@ public class Character : MonoBehaviour, IDamageable
 
     public void Spawn(Vector3 spawnPos)
     {
-        _isDead = false;
+        IsDead = false;
 
         //_transform.position = _followCamera.transform.position;
     }
 
-    public void Die()
+    public override void Die()
     {
-        _isDead = true;
-        Buffs.Clear();
+        base.Die();
+        _buffs.Clear();
     }
 
     public void ApplyBuff(Buff buff)
     {
         buff.Owner = this;
         buff.RemainingTime = buff.MaxTime;
-        Buffs.Add(buff);
+        _buffs.Add(buff);
     }
     
     // mb use coroutine?
@@ -102,22 +79,22 @@ public class Character : MonoBehaviour, IDamageable
     {
         const float tickDelay = 0.1f;
         
-        while (!_isDead)
+        while (!IsDead)
         {
             yield return new WaitForSeconds(tickDelay);
             
-            foreach (var buff in Buffs)
+            foreach (var buff in _buffs.ToArray())
             {
                 buff.RemainingTime -= tickDelay;
                 buff.Tick();
             }
 
             int removeOffset = 0;
-            for (var i = 0; i < Buffs.Count; i++)
+            for (var i = 0; i < _buffs.Count; i++)
             {
-                if (Buffs[i].RemainingTime <= 0)
+                if (_buffs[i].RemainingTime <= 0)
                 {
-                    Buffs.RemoveAt(i - removeOffset);
+                    _buffs.RemoveAt(i - removeOffset);
                     removeOffset++;
                 }
             }
@@ -137,5 +114,36 @@ public class Character : MonoBehaviour, IDamageable
             Health += i;
             yield return new WaitForSeconds(0.01f);
         }
+    }
+
+    private IEnumerator DoAttack()
+    {
+        while (Input.GetMouseButton(0))
+        {
+            CurrentWeapon.Attack();
+            yield return new WaitForSeconds(CurrentWeapon.AttackRate);
+        }
+    }
+
+    private float _attackDelay;
+
+    private void Update()
+    {
+        _attackDelay -= Time.deltaTime;
+        if (_attackDelay <= 0 && Input.GetMouseButton(0))
+        {
+            CurrentWeapon.Attack();
+            _attackDelay = CurrentWeapon.AttackRate;
+        }
+        // if (!_attackHolded && Input.GetMouseButtonDown(0))
+        // {
+        //     _attackHolded = true;
+        //     StartCoroutine(DoAttack());
+        // }
+        //
+        // if (Input.GetMouseButtonUp(0))
+        // {
+        //     _attackHolded = false;
+        // }
     }
 }

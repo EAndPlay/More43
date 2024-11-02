@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using NPC;
+using UnityEngine;
 
 namespace Dungeons
 {
@@ -10,6 +11,7 @@ namespace Dungeons
         [Header("For generation")]
         [SerializeField] private GameObject[] walls;
         [SerializeField] private GameObject[] doors;
+        //[SerializeField] private SpawnPoint[] spawnPoints;
         
         private Dungeon _dungeon;
         
