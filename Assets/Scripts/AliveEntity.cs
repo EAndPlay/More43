@@ -5,9 +5,13 @@ using Random = UnityEngine.Random;
 
 public struct DamageInfo
 {
+    public static int StaticId = 1;
+    
+    public int Id;
     public float Damage;
     public int CriticalChance;
     public float CriticalMultiplier;
+    public AliveEntity Owner;
 }
 
 public abstract class AliveEntity : MonoObject
@@ -15,6 +19,8 @@ public abstract class AliveEntity : MonoObject
     [SerializeField] protected float health;
     [SerializeField] protected float maxHealth;
     [SerializeField] protected bool isDead;
+    
+    private int _lastDamageInfoId;
     
     public event Action<float> HealthChanged;
     public event Action<float> MaxHealthChanged;
@@ -30,10 +36,8 @@ public abstract class AliveEntity : MonoObject
         get => health;
         set
         {
-            health = value;
             HealthChanged?.Invoke(value);
-            if (value <= 0)
-                Die();
+            health = value;
         }
     }
     
@@ -42,24 +46,32 @@ public abstract class AliveEntity : MonoObject
         get => maxHealth;
         set
         {
-            maxHealth = value;
             MaxHealthChanged?.Invoke(value);
+            maxHealth = value;
         }
     }
     
 
-    public virtual void Die()
+    public virtual void Die(AliveEntity killer = null)
     {
-        IsDead = true;
+        //IsDead = true;
         Died?.Invoke();
     }
     
-    public void ApplyDamage(DamageInfo damageInfo)
+    public virtual bool ApplyDamage(DamageInfo damageInfo)
     {
-        var rolledCrit = Random.Range(0, 100);
-        if (rolledCrit <= damageInfo.CriticalChance)
+        if (damageInfo.Id == _lastDamageInfoId) return false;
+        _lastDamageInfoId = damageInfo.Id;
+        
+        var rolledChance = Random.Range(0, 101);
+        if (rolledChance <= damageInfo.CriticalChance)
             damageInfo.Damage *= damageInfo.CriticalMultiplier;
-
+        
         Health -= damageInfo.Damage;
+        // if (health <= 0)
+        // {
+        //     Die(damageInfo.Owner);
+        // }
+        return true;
     }
 }

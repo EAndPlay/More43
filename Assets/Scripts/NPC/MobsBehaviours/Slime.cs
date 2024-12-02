@@ -2,11 +2,11 @@
 using UnityEngine;
 using Weapons;
 
-namespace NPC
+namespace NPC.MobsBehaviours
 {
     public sealed class Slime : Mob
     {
-        public override void RangeAttack()
+        protected override Action RangeAttack => () =>
         {
             var position = TargetTransform.position;
             //var ray = new Ray(Transform.position, position);
@@ -14,7 +14,9 @@ namespace NPC
             var objTransform = obj.transform;
             objTransform.LookAt(position);
             obj.GetComponent<SpitProjectile>().owner = this;
-            obj.GetComponent<Rigidbody>().velocity = ((position + (Target.GetComponent<Rigidbody>().velocity / (float)Math.Sqrt(2)) - Vector3.up) - objTransform.position).normalized * 15;
-        }
+            obj.GetComponent<Rigidbody>().velocity =
+                ((position + (Target.GetComponent<Rigidbody>().velocity / (float)Math.Sqrt(2)) - Vector3.up) -
+                 objTransform.position).normalized * 15;
+        };
     }
 }

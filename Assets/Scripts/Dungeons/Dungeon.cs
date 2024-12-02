@@ -1,21 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using NPC;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Dungeons
 {
-    public sealed class Dungeon : MonoBehaviour
+    public sealed class Dungeon : MonoObject
     {
         public int MinLevel;
         public int MaxLevel;
 
+        public int MaxMobsCount;
+        public int CurrentMobsCount;
+        public bool isBossDead;
+        
+        public Vector2Int size;
+        public int startPos;
+        public Vector2 offset;
+        public Rule[] rooms;
+        
+        [SerializeField] private GameObject[] bossRooms;
         [SerializeField] private GameObject dungeonEnter;
-        [SerializeField] private DungeonRoom[] rooms1;
-
         [SerializeField] private GameObject spawnPoint;
+        [SerializeField] private Player player;
 
+        private GameObject _exitPortal;
+        public GameObject exitSpawnPoint;
+        
+        private List<Cell> _grid;
+        private int _bossRoomId;
+        
         [Serializable]
         public class Rule
         {
@@ -26,11 +42,7 @@ namespace Dungeons
             public bool obligatory;
 
             public int ProbabilityOfSpawning(int x, int y)
-            {
-                // TODO: make chest rooms with it
-                // TODO: !!!!! make exit mb with it
-                // 0 - cannot spawn 1 - can spawn 2 - HAS to spawn
-
+            { 
                 if (x >= minPosition.x && x <= maxPosition.x && y >= minPosition.y && y <= maxPosition.y)
                     return obligatory ? 2 : 1;
 
@@ -38,30 +50,69 @@ namespace Dungeons
             }
         }
 
-        private void Awake()
+        private void Start()
         {
-            MazeGenerator();
+            // MazeGenerator();
+            // CurrentMobsCount = MaxMobsCount;
         }
 
-        public Vector2Int size;
-        public int startPos = 0;
-        public Rule[] rooms;
-        public Vector2 offset;
+        public void Create()
+        {
+            MazeGenerator();
+            CurrentMobsCount = MaxMobsCount;
+        }
 
-        private List<Cell> _grid;
+        public void Reset()
+        {
+            for (int i = 0; i < Transform.childCount; i++)
+            {
+                Destroy(Transform.GetChild(i).gameObject);
+            }
+        }
+
+        public void RegisterMobDeath(Mob mob)
+        {
+            if (mob.isBoss)
+                isBossDead = true;
+            else
+                CurrentMobsCount--;
+            MobDied?.Invoke(mob);
+
+            if (CurrentMobsCount == 0 && isBossDead)
+                OnComplete();
+        }
+
+        private void OnComplete()
+        {
+            _exitPortal.SetActive(true);
+            player.GiveExperience(Random.Range(MinLevel, MaxLevel + 1) * 100);
+
+            MinLevel += 2;
+            MaxLevel += 2;
+        }
+
+        public event Action<Mob> MobDied;
 
         private void GenerateDungeon()
         {
             for (var i = 0; i < size.x; i++)
             for (var j = 0; j < size.y; j++)
             {
-                var currentCell = _grid[i + j * size.x];
+                var roomId = i + j * size.x;
+                var currentCell = _grid[roomId];
+
+                var roomPosition = new Vector3(i * offset.x, 0, -j * offset.y);
+                if (_bossRoomId == roomId)
+                {
+                    goto BossRoom;
+                }
                 if (!currentCell.Visited) continue;
                 
                 var randomRoom = -1;
                 var availableRooms = new List<int>();
 
                 for (var k = 0; k < rooms.Length; k++)
+                {
                     switch (rooms[k].ProbabilityOfSpawning(i, j))
                     {
                         case 1:
@@ -71,20 +122,36 @@ namespace Dungeons
                             randomRoom = k;
                             break;
                     }
-
+                }
+                
                 if (randomRoom == -1)
                 {
                     randomRoom = availableRooms.Count > 0 ? availableRooms[Random.Range(0, availableRooms.Count)] : 0;
                 }
 
-
-                var newRoom = Instantiate(rooms[randomRoom].room, new Vector3(i * offset.x, 0, -j * offset.y),
+                goto CommonRoom;
+                
+                DungeonRoom newRoom;
+                
+                BossRoom: 
+                newRoom = Instantiate(bossRooms[Random.Range(0, bossRooms.Length)], roomPosition,
+                    Quaternion.identity, transform).GetComponent<DungeonRoom>();
+                
+                _exitPortal = newRoom.exitPortalSpawnPoint.gameObject;
+                _exitPortal.SetActive(false);
+                newRoom.exitPortalSpawnPoint.exitSpawnPoint = exitSpawnPoint;
+                //newRoom.GetComponentInChildren<DungeonExit>().exitSpawnPoint = exitPortal
+                goto RoomInitialize;
+                
+                CommonRoom:
+                newRoom = Instantiate(rooms[randomRoom].room, roomPosition,
                     Quaternion.identity, transform).GetComponent<DungeonRoom>();
                 if (i == 0 && j == 0)
                 {
-                    spawnPoint = newRoom.spawnPoint;
-                    Debug.Log($"SpawnPoint set");
+                    spawnPoint = newRoom.playerSpawnPoint;
                 }
+                
+                RoomInitialize:
                 newRoom.Initialize(currentCell.Status);
                 newRoom.name = new StringBuilder(" ").Append(i).Append("-").Append(j).ToString();
             }
@@ -112,7 +179,6 @@ namespace Dungeons
 
                 if (currentCell == _grid.Count - 1) break;
 
-                //Check the cell's neighbors
                 var neighbors = CheckNeighbors(currentCell);
 
                 if (neighbors.Count == 0)
@@ -124,7 +190,6 @@ namespace Dungeons
                 else
                 {
                     path.Push(currentCell);
-
                     var newCell = neighbors[Random.Range(0, neighbors.Count)];
 
                     if (newCell > currentCell)
@@ -159,6 +224,8 @@ namespace Dungeons
                             _grid[currentCell].Status[1] = true;
                         }
                     }
+
+                    _bossRoomId = currentCell;
                 }
             }
 
@@ -184,30 +251,11 @@ namespace Dungeons
             return neighbors;
         }
 
-        // mb add params?
-        public void Create()
-        {
-            var roomsCount = 1; //Random.Range(3, 6);
-            Array.Resize(ref rooms1, roomsCount);
-
-            var sb = new StringBuilder();
-            const string dungeonPath = "DungeonRooms/DungRoom";
-            for (var i = 0; i < roomsCount; i++)
-            {
-                sb.Insert(dungeonPath.Length, i);
-                var dungObj = (GameObject)Instantiate(Resources.Load(sb.ToString(), typeof(GameObject)));
-
-                var dungTransform = dungObj.transform;
-                //dungTransform.position = 
-                // TODO: dungObj.position/rotation set to free DungeonRoom.roomConnection
-            }
-        }
-
         public Vector3 GetEnterPosition() => spawnPoint.transform.position;
 
         private class Cell
         {
-            public bool Visited = false;
+            public bool Visited;
             public readonly bool[] Status = new bool[4];
         }
     }

@@ -25,6 +25,8 @@ public class PlanetMouseOrbit : MonoBehaviour
         Vector3 eulerAngles = transform.eulerAngles;
         x = eulerAngles.y;
         y = eulerAngles.x;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     public void Update()

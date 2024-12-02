@@ -6,6 +6,7 @@
         
         public RegenerationBuff(float healthAdd = 0.25f, float maxTime = 10)
         {
+            Type = BuffType.Regeneration;
             HealthAdd = healthAdd;
             MaxTime = maxTime;
         }

@@ -16,7 +16,8 @@ namespace Weapons
 
             var damageInfo = new DamageInfo
             {
-                Damage = owner.damage
+                Damage = owner.damageModifier,
+                Owner = owner
             };
             ent.ApplyDamage(damageInfo);
         }

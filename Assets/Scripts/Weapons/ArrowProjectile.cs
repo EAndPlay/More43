@@ -6,32 +6,30 @@ using UnityEngine.Serialization;
 
 namespace Weapons
 {
+    [RequireComponent(typeof(Rigidbody))]
     public class ArrowProjectile : MonoBehaviour
     {
-        public BowWeapon owner;
+        public RangeWeapon owner;
         private void OnTriggerEnter(Collider other)
         {
             AliveEntity ent;
-            if (!(ent = other.GetComponent<Mob>())) return;
-
+            if (!(ent = other.GetComponent<Character>())) return;
+            
             var damageInfo = new DamageInfo
             {
-                Damage = owner.Damage,
-                CriticalChance = owner.CriticalChance,
-                CriticalMultiplier = owner.CriticalMultiplier
+                Id = DamageInfo.StaticId++,
+                Damage = owner.damage,
+                CriticalChance = owner.criticalChance,
+                CriticalMultiplier = owner.criticalMultiplier,
+                Owner = owner.owner
             };
             ent.ApplyDamage(damageInfo);
-        }
-
-        private IEnumerator DestroyOnEnd()
-        {
-            yield return new WaitForSeconds(1);
             Destroy(gameObject);
         }
         
         private void Awake()
         {
-            StartCoroutine(DestroyOnEnd());
+            Destroy(gameObject, 1);
         }
     }
 }

@@ -6,26 +6,32 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
+[RequireComponent(typeof(Character))]
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float speed = 50;
     [SerializeField] private float jumpForce = 20;
     [SerializeField] private Camera _camera;
     [SerializeField] private float currentSpeed;
+    [SerializeField] private Rigidbody rigidBody;
     private Transform _cameraTransform;
     private Transform _transform;
     private Character _character;
-    private Rigidbody _rigidBody;
+    private Animator _animator;
 
     private float _dashDelay;
+    private static readonly int YMoveId = Animator.StringToHash("YMoveBlend");
+    private static readonly int XMoveId = Animator.StringToHash("XMoveBlend");
 
     private void Awake()
     {
         _cameraTransform = _camera.transform;
         _transform = transform;
         _character = GetComponent<Character>();
-        _rigidBody = GetComponent<Rigidbody>();
+        //rigidBody = GetComponent<Rigidbody>();
+        _animator = GetComponent<Animator>();
     }
+    private static float _sqrt2 = (float)Math.Sqrt(2);
 
     private void FixedUpdate()
     {
@@ -39,7 +45,7 @@ public class PlayerMovement : MonoBehaviour
         // var rightVector = _cameraTransform.right;
         //
         var moveVector = new Vector3();
-        var rotateVector = _rigidBody.rotation;
+        var rotateVector = rigidBody.rotation;
         //
         // if (Input.GetKey(KeyCode.W))
         // {
@@ -71,50 +77,65 @@ public class PlayerMovement : MonoBehaviour
         var rightVector = _camera.transform.right;
         
         moveVector = new Vector3();
-        rotateVector = _rigidBody.rotation;
+        rotateVector = rigidBody.rotation;
+        var velocityCopy = rigidBody.velocity;
+
+        int animMovement = 0;
+        float xMove = 0;
+        float yMove = 0;
         
+        rotateVector = forwardRotation * Quaternion.Euler(new Vector3(0, 180, 180));
         if (Input.GetKey(KeyCode.W))
         {
             moveVector += forwardVector;
             //rotateVector = forwardRotation * Quaternion.Euler(new Vector3(0, 180, 180));
-            rotateVector = forwardRotation * Quaternion.Euler(new Vector3(0, 180, 180));
+            yMove = 1;
         }
         
         if (Input.GetKey(KeyCode.A))
         {
             moveVector -= rightVector;
-            rotateVector = forwardRotation * Quaternion.Euler(new Vector3(180, 90, 0));
+            //rotateVector = forwardRotation * Quaternion.Euler(new Vector3(180, 90, 0));
+            animMovement |= (int)MovementType.Left;
+            xMove = -1;
         }
         
         if (Input.GetKey(KeyCode.S))
         {
             moveVector -= forwardVector;
-            rotateVector = forwardRotation * Quaternion.Euler(new Vector3(0, 0, 180));
+            //rotateVector = forwardRotation * Quaternion.Euler(new Vector3(0, 0, 180));
+            yMove = -1;
         }
         
         if (Input.GetKey(KeyCode.D))
         {
             moveVector += rightVector;
-            rotateVector = forwardRotation * Quaternion.Euler(new Vector3(0, 90, 180));
+            //rotateVector = forwardRotation * Quaternion.Euler(new Vector3(0, 90, 180));
+            animMovement |= (int)MovementType.Right;
+            xMove = 1;
         }
-        
+        _animator.SetFloat(XMoveId, xMove);
+        _animator.SetFloat(YMoveId, yMove);
         _transform.rotation = rotateVector;
         //_character.transform.LookAt(_character.transform.position + moveVector);
-        moveVector *= speed;
+        
+        var calcSpeed = speed;
+        if (xMove != 0 && yMove != 0)
+            calcSpeed /= _sqrt2;
+        moveVector *= calcSpeed;
 
         //transform.Translate(moveVector * Time.deltaTime);
 
-        if (Input.GetKeyDown(KeyCode.Space) && _dashDelay >= 1)
+        if ((xMove != 0 || yMove != 0) && Input.GetKeyDown(KeyCode.Space) && _dashDelay <= 0)
         {
-            _dashDelay = 0;
-            _rigidBody.position += moveVector * 50;
+            _dashDelay = 1;
+            rigidBody.position += moveVector * 20;
+            //rigidBody.velocity = new Vector3(moveVector.x, velocityCopy.y, moveVector.z) * 35;
         }
         //_rigidBody.velocity += Vector3.up * jumpForce;
         //_rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange);
         
-        var velocityCopy = _rigidBody.velocity;
-        _rigidBody.velocity = new Vector3(moveVector.x, velocityCopy.y, moveVector.z);
-
+        rigidBody.velocity = new Vector3(moveVector.x, velocityCopy.y, moveVector.z);
         
         // Vector3 getGlobaleFacingVector3(float resultAngle)
         // {
@@ -176,9 +197,17 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        if (_rigidBody.velocity.y < 0)
+        if (rigidBody.velocity.y < 0)
         {
-            _rigidBody.velocity += Vector3.up * (Physics.gravity.y * Time.deltaTime);
+            rigidBody.velocity += Vector3.up * (Physics.gravity.y * Time.deltaTime);
         }
+    }
+    
+    public enum MovementType : int
+    {
+        Forward = 0b1,
+        Backward = 0b10,
+        Left = 0b100,
+        Right = 0b1000
     }
 }

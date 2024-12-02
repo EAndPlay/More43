@@ -7,14 +7,16 @@ namespace Dungeons
     {
         public Dungeon linkedDungeon;
 
+        public GameObject exitSpawnPoint;
+        
         private void OnTriggerEnter(Collider other)
         {
-            Character character;
-            if (!(character = other.GetComponent<Character>())) return;
-
-            // TODO: lvl/smth check
-
-            character.transform.position = linkedDungeon.GetEnterPosition();
+            Player player;
+            if (!(player = other.GetComponent<Player>())) return;
+            linkedDungeon.exitSpawnPoint = exitSpawnPoint;
+            player.EnterDungeon(linkedDungeon);
+            
+            player.Character.transform.position = linkedDungeon.GetEnterPosition();
         }
     }
 }
