@@ -272,6 +272,7 @@
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\ChatCommand\ActionCommand.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Items\CurrencyItem.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Interactables\UnitSpawnControllerInteractable.cs" />
+    <Compile Include="Assets\Scripts\PlayerNotification.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\UI\CloseableWindows\NewGameSpecializationPanelController.cs" />
     <Compile Include="Assets\Scripts\DamageNotification.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Inventory\VendorItem.cs" />
@@ -397,6 +398,7 @@
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Interactables\InteractableOption.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\ObjectControllers\SnowEffectController.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Abilities\Effect\AOEEffectProperties.cs" />
+    <Compile Include="Assets\Scripts\HealableObject.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Characters\ModelProviders\SwappableMeshModelProvider.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Interactables\MusicPlayerConfig.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\UI\CloseableWindows\QuestGiverUI.cs" />
@@ -474,14 +476,12 @@
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\GameManager\ResourceProfiles\ArmorClass.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Items\GatherLootTable.cs" />
     <Compile Include="Assets\Scripts\Buffs\Buff.cs" />
-    <Compile Include="Assets\Scripts\Weapons\ArrowProjectile.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Interactables\MoveableObjectProps.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Abilities\Effect\RainEffect.cs" />
     <Compile Include="Assets\Scripts\Dungeons\DungeonRoom.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Interactables\AnimatedObjectProps.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Interactables\ClickSwitchProps.cs" />
     <Compile Include="Assets\Scripts\Player.cs" />
-    <Compile Include="Assets\Scripts\NPC\MobsBehaviours\Skeleton.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\UI\Buttons\ActionButtonNode.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Quest\IPrerequisite.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\UI\Buttons\SwappableMeshOptionChoiceButton.cs" />
@@ -502,6 +502,7 @@
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\UI\CreditCategoryController.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\GameManager\ResourceProfiles\AnimationProfileNode.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\UI\CloseableWindows\BagPanel.cs" />
+    <Compile Include="Assets\Scripts\ProjectileDestroyingObject.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\UI\CloseableWindows\AchievementPanelUI.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Items\Item.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\GameManager\ResourceProfiles\AttachmentProfile.cs" />
@@ -526,6 +527,7 @@
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Abilities\Effect\PetControlEffectConfig.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Abilities\Effect\AttackEffectProperties.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Interactables\PatrolComponent.cs" />
+    <Compile Include="Assets\Scripts\Weapons\Projectile.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\UI\Buttons\DescribableIcon.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\GameManager\ResourceProfiles\ResourcePropertyType.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\ChatCommand\GainExperienceCommand.cs" />
@@ -682,6 +684,7 @@
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\UI\UINavigationListHorizontal.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\GameManager\ChatCommandManager.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Interactables\ClickSwitch.cs" />
+    <Compile Include="Assets\Scripts\NPC\MobsBehaviours\SkeletonMelee.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Interactables\AnimatedObjectComponent.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Abilities\Effect\PetEffect.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Characters\ModelProviders\UMAModelSlotOptions.cs" />
@@ -732,6 +735,7 @@
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Abilities\Effect\StatusEffectNode.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\GameManager\ResourceProfiles\CombatStrategy.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Characters\BaseClasses\NamePlateProps.cs" />
+    <Compile Include="Assets\TeKniKo_Free\Power_Ups\Scripts\ObjectBounce.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\UI\ColoredBottomLeftCornerWide.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\GameManager\CurrencyConverter.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Quest\TradeSkillObjective.cs" />
@@ -833,6 +837,7 @@
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\UI\ColoredLineDetail.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\GameManager\ResourceProfiles\QuestGiverProfile.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\UI\CloseableWindows\ClassChangePanelController.cs" />
+    <Compile Include="Assets\Scripts\NPC\MobsBehaviours\SkeletonRange.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\Helper\ShowRealEulerAngles.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\GameManager\CombatTextManager.cs" />
     <Compile Include="Assets\AnyRPG\Core\System\Scripts\GameManager\ConfiguredMonoBehaviour.cs" />

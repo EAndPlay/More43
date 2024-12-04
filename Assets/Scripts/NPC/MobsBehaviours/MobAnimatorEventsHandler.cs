@@ -15,5 +15,12 @@ namespace NPC.MobsBehaviours
             _mob.weapon.Disable();
             //_animator.ResetTrigger(MeleeAttackAnimId);
         }
+
+        private void RangeAttackAnimationEnded(string _)
+        {
+            if (!_mob.isAttacking) return;
+            _mob.weapon.Attack(new object[] { _mob.target.partForRangeAttack.transform });
+            _mob.isAttacking = false;
+        }
     }
 }

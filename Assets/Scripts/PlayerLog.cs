@@ -6,20 +6,16 @@ using UnityEngine.UI;
 
 public class PlayerLog : MonoBehaviour
 {
-    private static TMP_Text _logTextElement;
-    private static Transform _transform;
+    private static PlayerNotification _playerNotification;
     
     private void Awake()
     {
-        _transform = transform;
-        _logTextElement = Resources.Load<TMP_Text>("LogTextElement");
+        _playerNotification = Resources.Load<PlayerNotification>("PlayerNotification");
     }
     
-    public static void Add(string text, Color32 color)
+    public static void Add(string text, Color32 color, Character character)
     {
-        var logText = Instantiate(_logTextElement, _transform);
-        logText.faceColor = color;
-        logText.text = text;
-        Destroy(logText, 10);
+        var logText = Instantiate(_playerNotification, GameGlobals.IndependentObjects);
+        logText.Notify(text, character.Transform.position + Vector3.up * 2, color);
     }
 }

@@ -14,9 +14,16 @@ namespace Buffs
         // public BuffAffection OnTick;
 
         public virtual void Tick() { }
-        
-        public virtual void OnActivate() {}
-        public virtual void OnDeactivate() {}
+
+        public virtual void OnActivate()
+        {
+            RemainingTime = MaxTime;
+        }
+
+        public virtual void OnDeactivate()
+        {
+            RemainingTime = -1;
+        }
 
         public enum BuffType
         {

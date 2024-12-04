@@ -22,11 +22,13 @@ namespace Buffs
 
         public override void OnActivate()
         {
+            base.OnActivate();
             _particleSystem = Owner.AddParticles(GameGlobals.BurningParticles);
         }
 
         public override void OnDeactivate()
         {
+            base.OnDeactivate();
             Owner.RemoveParticles(_particleSystem);
         }
     }

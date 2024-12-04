@@ -7,26 +7,34 @@ namespace Weapons
 {
     public class RangeWeapon : Weapon
     {
+        public GameObject projectile;
+        public bool projectileLookAtTarget;
         [SerializeField] private Transform projectileSpawnPoint;
-        private GameObject _projectile;
         
-        private void Awake()
-        {
-            _projectile = Resources.Load<GameObject>("Weapons/FireBall");
-        }
-        
+        // private void Awake()
+        // {
+        //     projectile = Resources.Load<GameObject>("Weapons/FireBall");
+        // }
+
         public override void Attack(object[] args)
         {
             var targetTransform = (Transform)args[0];
-            var ray = InGameCamera.mainCamera.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out var hit, 100))
+
+            var startPos = projectileSpawnPoint.position;
+            var targetPos = targetTransform.position;
+            var direction = targetPos - startPos;
+            
+            var obj = Instantiate(projectile, startPos, Quaternion.identity, GameGlobals.IndependentObjects).GetComponent<Projectile>();
+            var objTransform = obj.transform;
+            
+            if (projectileLookAtTarget)
             {
-                var obj = Instantiate(_projectile, projectileSpawnPoint.position, Quaternion.identity);
-                var objTransform = obj.transform;
-                //objTransform.LookAt(hit.point);
-                obj.GetComponent<ArrowProjectile>().owner = this;
-                obj.GetComponent<Rigidbody>().velocity = ((targetTransform.position + (targetTransform.GetComponentInParent<Rigidbody>().velocity / (float)Math.Sqrt(2)) - Vector3.up) - objTransform.position).normalized * 15;
+                objTransform.rotation = Quaternion.LookRotation(direction.normalized) * new Quaternion(0, 90, 90, 0);
+                //objTransform.Rotate(0, 90, 90);
             }
+
+            obj.owner = this;
+            obj.GetComponent<Rigidbody>().velocity = direction.normalized * 15; //((targetTransform.position + (targetTransform.GetComponentInParent<Rigidbody>().velocity / (float)Math.Sqrt(2)) - Vector3.up) - objTransform.position).normalized * 15;
         }
     }
 }

@@ -58,6 +58,8 @@ namespace Dungeons
 
         public void Create()
         {
+            MaxMobsCount = 0;
+            isBossDead = false;
             MazeGenerator();
             CurrentMobsCount = MaxMobsCount;
         }
@@ -76,6 +78,7 @@ namespace Dungeons
                 isBossDead = true;
             else
                 CurrentMobsCount--;
+
             MobDied?.Invoke(mob);
 
             if (CurrentMobsCount == 0 && isBossDead)
@@ -87,8 +90,8 @@ namespace Dungeons
             _exitPortal.SetActive(true);
             player.GiveExperience(Random.Range(MinLevel, MaxLevel + 1) * 100);
 
-            MinLevel += 2;
-            MaxLevel += 2;
+            MinLevel = player.level;
+            MaxLevel = player.level + Random.Range(1, 3);
         }
 
         public event Action<Mob> MobDied;

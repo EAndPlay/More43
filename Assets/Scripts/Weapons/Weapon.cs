@@ -7,10 +7,9 @@ public abstract class Weapon : MonoObject
     public float damage;
     public int criticalChance;
     public float criticalMultiplier;
-    public float attackRate;
+    //public float attackRate;
     public AliveEntity owner;
     
-    private Collider _triggerCollider;
     
     // private void OnTriggerEnter(Collider other)
     // {
@@ -20,19 +19,12 @@ public abstract class Weapon : MonoObject
 
     // TODO: leave or make AI/Character.Attack()
     public virtual void Attack(object[] args = null) { } // Sword, Bow
-
-    private void Awake()
-    {
-        _triggerCollider = GetComponent<BoxCollider>();
-    }
     
-    public void Enable()
+    public virtual void Enable()
     {
-        _triggerCollider.enabled = true;
     }
 
-    public void Disable()
+    public virtual void Disable()
     {
-        _triggerCollider.enabled = false;
     }
 }

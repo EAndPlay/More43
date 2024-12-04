@@ -7,13 +7,20 @@ using UnityEngine.Serialization;
 namespace Weapons
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class ArrowProjectile : MonoBehaviour
+    public class Projectile : MonoObject
     {
+        [HideInInspector]
         public RangeWeapon owner;
+        
         private void OnTriggerEnter(Collider other)
         {
             AliveEntity ent;
-            if (!(ent = other.GetComponent<Character>())) return;
+            if (!(ent = other.GetComponent<Character>()))
+            {
+                // if (other.GetComponent<ProjectileDestroyingObject>())
+                //     Destroy(gameObject);
+                return;
+            }
             
             var damageInfo = new DamageInfo
             {
@@ -26,10 +33,10 @@ namespace Weapons
             ent.ApplyDamage(damageInfo);
             Destroy(gameObject);
         }
-        
+
         private void Awake()
         {
-            Destroy(gameObject, 1);
+            Destroy(gameObject, 2);
         }
     }
 }

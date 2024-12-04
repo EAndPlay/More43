@@ -14,10 +14,9 @@ public sealed class Player : MonoBehaviour
     [SerializeField] private HUD hud;
 
     private int _experience; 
-    
     public int neededExperience;
-    public Character Character;
-    public Dungeon CurrentDungeon;
+    public Character character;
+    public Dungeon currentDungeon;
     public Inventory.Inventory Inventory;
     
     public int level;
@@ -32,27 +31,18 @@ public sealed class Player : MonoBehaviour
             hud.currentExperience.text = _experience.ToString();
         }
     }
-    
-    public Location CurrentLocation;
-    
-    private void Awake()
-    {
-        //_hud = GetComponent<HUD>();
-    }
 
     private void Start()
     {
-        //Character = GetComponent<Character>();
-        //TODO: remove subs on destroy? make them local (not anon) => add in <Died> event, back on <Spawned>
-        Character.HealthChanged += health =>
+        character.HealthChanged += health =>
         {
             hud.currentHealth.text = ((int) health).ToString();
-            hud.healthSlider.value = health / Character.MaxHealth;
+            hud.healthSlider.value = health / character.MaxHealth;
         };
-        Character.MaxHealthChanged += maxHealth =>
+        character.MaxHealthChanged += maxHealth =>
         {
             hud.maxHealth.text = ((int) maxHealth).ToString();
-            hud.healthSlider.value = Character.Health / maxHealth;
+            hud.healthSlider.value = character.Health / maxHealth;
         };
         hud.dungeonStats.enabled = false;
         level = 1;
@@ -61,9 +51,7 @@ public sealed class Player : MonoBehaviour
         hud.neededExperience.text = "150";
         hud.currentLevel.text = "1";
         
-        Inventory = new(10, null);
-        //Inventory = new(stats.ItemsMaxSlots, null);
-        //Character.Spawn(SceneManager.GetActiveScene().GetRootGameObjects().First(x => x.GetComponent<SpawnPoint>() != null).transform.position, new SpawnStats());
+        //Inventory = new(10, null, this);
     }
 
     public void EnterDungeon(Dungeon dungeon)
@@ -72,8 +60,8 @@ public sealed class Player : MonoBehaviour
         dungeon.MaxLevel = level + Random.Range(0, 3);
         dungeon.Create();
 
-        Character.dungeonDeathSpawnPoint = dungeon.exitSpawnPoint;
-        CurrentDungeon = dungeon;
+        character.dungeonDeathSpawnPoint = dungeon.exitSpawnPoint;
+        currentDungeon = dungeon;
         hud.dungeonStats.enabled = true;
         dungeon.MobDied += RegisterMobDeath;
         hud.currentMobsCount.text = "0";
@@ -82,19 +70,20 @@ public sealed class Player : MonoBehaviour
 
     public void LeaveDungeon()
     {
+        character.Health = character.MaxHealth;
         hud.dungeonStats.enabled = false;
         hud.mobsStatusMark.sprite = GameGlobals.NotDoneMark;
         hud.bossStatusMark.sprite = GameGlobals.NotDoneMark;
 
-        CurrentDungeon.MobDied -= RegisterMobDeath;
-        CurrentDungeon.Reset();
-        CurrentDungeon = null;
+        currentDungeon.MobDied -= RegisterMobDeath;
+        currentDungeon.Reset();
+        currentDungeon = null;
     }
 
     public void GiveExperience(int exp)
     {
         var sb = new StringBuilder("+EXP: ").Append(exp);
-        PlayerLog.Add(sb.ToString(), new Color32(255, 255, 0, 255));
+        PlayerLog.Add(sb.ToString(), new Color32(255, 255, 0, 255), character);
         if (Experience + exp >= neededExperience)
         {
             var oldExp = neededExperience;
@@ -119,9 +108,9 @@ public sealed class Player : MonoBehaviour
         level++;
         hud.currentLevel.text = level.ToString();
 
-        Character.MaxHealth *= 1.1f + Mathf.Sqrt(Character.MaxHealth) / Character.MaxHealth;
-        Character.Health = Character.MaxHealth;
-        Character.damageModifier += 0.2f;
+        character.MaxHealth *= 1.1f + Mathf.Sqrt(character.MaxHealth) / character.MaxHealth;
+        character.Health = character.MaxHealth;
+        character.damageModifier += 0.2f;
     }
     
     public void OnKill(Mob mob)
@@ -130,30 +119,31 @@ public sealed class Player : MonoBehaviour
         
         foreach (var dropItem in mob.drop)
         {
-            if (dropItem.Chance < Random.Range(0, 101)) continue;
+            if (dropItem.chance < Random.Range(0, 101)) continue;
 
-            var itemCount = Random.Range(dropItem.MinCount, dropItem.MaxCount + 1);
+            var itemCount = Random.Range(dropItem.minCount, dropItem.maxCount + 1);
             
-            Inventory.AddItem(dropItem.Item, itemCount);
+            Inventory.AddItem(dropItem.item, itemCount);
 
-            var sb = new StringBuilder("Gain item: ").Append(dropItem.Item.Name);
+            var sb = new StringBuilder("Gain item: ").Append(dropItem.item.Name);
             if (itemCount > 1)
                 sb.Append(" (x").Append(itemCount).Append(")");
-            
-            PlayerLog.Add(sb.ToString(), new Color32(0, 0, 255, 255));
+
+            PlayerLog.Add(sb.ToString(), new Color32(0, 0, 255, 255), character);
         }
     }
 
     public void OnDie()
     {
         Experience = 0;
-        LeaveDungeon();
+        if (currentDungeon)
+            LeaveDungeon();
     }
 
     private void RegisterMobDeath(Mob mob)
     {
-        hud.currentMobsCount.text = (CurrentDungeon.MaxMobsCount - CurrentDungeon.CurrentMobsCount).ToString();
-        if (CurrentDungeon.CurrentMobsCount == 0)
+        hud.currentMobsCount.text = (currentDungeon.MaxMobsCount - currentDungeon.CurrentMobsCount).ToString();
+        if (currentDungeon.CurrentMobsCount == 0)
         {
             hud.mobsStatusMark.sprite = GameGlobals.DoneMark;
         }
@@ -161,10 +151,5 @@ public sealed class Player : MonoBehaviour
         {
             hud.bossStatusMark.sprite = GameGlobals.DoneMark;
         }
-    }
-    
-    private void EnterLocation(Location location)
-    {
-        
     }
 }

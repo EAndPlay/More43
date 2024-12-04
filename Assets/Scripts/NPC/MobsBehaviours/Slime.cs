@@ -15,7 +15,7 @@ namespace NPC.MobsBehaviours
             objTransform.LookAt(position);
             obj.GetComponent<SpitProjectile>().owner = this;
             obj.GetComponent<Rigidbody>().velocity =
-                ((position + (Target.GetComponent<Rigidbody>().velocity / (float)Math.Sqrt(2)) - Vector3.up) -
+                ((position + (target.GetComponent<Rigidbody>().velocity / (float)Math.Sqrt(2)) - Vector3.up) -
                  objTransform.position).normalized * 15;
         };
     }

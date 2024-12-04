@@ -13,10 +13,7 @@
 
         public override void Tick()
         {
-            if (Owner.Health < Owner.MaxHealth - HealthAdd)
-                Owner.Health += HealthAdd;
-            else
-                Owner.Health = Owner.MaxHealth;
+            Owner.Health += HealthAdd;
         }
     }
 }

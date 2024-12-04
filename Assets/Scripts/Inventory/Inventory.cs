@@ -30,13 +30,15 @@ namespace Inventory
     
     public class Inventory
     {
+        public Player Owner;
         private static readonly string NoEnoughSlots = "No enough slots!";
         
         private List<ItemSlot> _itemSlots;
         public int MaxSlots;
 
-        public Inventory(int maxSlots, IEnumerable<Item> items)
+        public Inventory(int maxSlots, IEnumerable<Item> items, Player owner)
         {
+            Owner = owner;
             MaxSlots = maxSlots;
 
             if (items != null)
@@ -81,7 +83,7 @@ namespace Inventory
                 var isOverflowed = possibleSlots - slots - (extraCount != 0 ? 1 : 0) < 0;
                 if (isOverflowed)
                 {
-                    PlayerLog.Add(NoEnoughSlots, new Color32(255, 85, 0, 255));
+                    PlayerLog.Add(NoEnoughSlots, new Color32(255, 85, 0, 255), Owner.character);
                     for (var i = 0; i < possibleSlots; i++)
                     {
                         _itemSlots.Add(new ItemSlot { Item = item.Clone(), Stack = item.MaxStack });

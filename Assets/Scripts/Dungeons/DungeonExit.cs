@@ -11,7 +11,7 @@ namespace Dungeons
             Player player;
             if (!(player = other.GetComponent<Player>())) return;
 
-            player.Character.transform.position = exitSpawnPoint.transform.position;
+            player.character.transform.position = exitSpawnPoint.transform.position;
             player.LeaveDungeon();
         }
     }

@@ -200,7 +200,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0486b43ea564bbf8f1a1cc54d4c259e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Transform: {fileID: 0}
   playerSpawnPoint: {fileID: 0}
+  exitPortalSpawnPoint: {fileID: 0}
   walls:
   - {fileID: 6517783738730485668}
   - {fileID: 7584538308369218939}
@@ -1136,7 +1138,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1846483167569140225, guid: 749d7ad8a52e79f4d8069249dbb671a2, type: 3}
       propertyPath: MobsArray.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1846483167569140225, guid: 749d7ad8a52e79f4d8069249dbb671a2, type: 3}
       propertyPath: MobsArray.Array.data[0]
@@ -1146,6 +1148,10 @@ PrefabInstance:
       propertyPath: MobsArray.Array.data[1]
       value: 
       objectReference: {fileID: 649793086691371578, guid: 96461382113d48749b6d97d77f96afd9, type: 3}
+    - target: {fileID: 1846483167569140225, guid: 749d7ad8a52e79f4d8069249dbb671a2, type: 3}
+      propertyPath: MobsArray.Array.data[2]
+      value: 
+      objectReference: {fileID: 649793086691371578, guid: 4d999d3bb2b62bb4086c42b39d009ea0, type: 3}
     - target: {fileID: 7334649361185491965, guid: 749d7ad8a52e79f4d8069249dbb671a2, type: 3}
       propertyPath: m_RootOrder
       value: -1
@@ -1223,6 +1229,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5421194926210567576}
     m_Modifications:
+    - target: {fileID: 4282854172872116063, guid: e7a79a14190d3d34f93236ba7164d734, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7564636611156017616, guid: e7a79a14190d3d34f93236ba7164d734, type: 3}
       propertyPath: m_Name
       value: Floor_Flat
@@ -1589,7 +1599,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1846483167569140225, guid: 749d7ad8a52e79f4d8069249dbb671a2, type: 3}
       propertyPath: MobsArray.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1846483167569140225, guid: 749d7ad8a52e79f4d8069249dbb671a2, type: 3}
       propertyPath: MobsArray.Array.data[0]
@@ -1599,6 +1609,10 @@ PrefabInstance:
       propertyPath: MobsArray.Array.data[1]
       value: 
       objectReference: {fileID: 649793086691371578, guid: 96461382113d48749b6d97d77f96afd9, type: 3}
+    - target: {fileID: 1846483167569140225, guid: 749d7ad8a52e79f4d8069249dbb671a2, type: 3}
+      propertyPath: MobsArray.Array.data[2]
+      value: 
+      objectReference: {fileID: 649793086691371578, guid: 4d999d3bb2b62bb4086c42b39d009ea0, type: 3}
     - target: {fileID: 7334649361185491965, guid: 749d7ad8a52e79f4d8069249dbb671a2, type: 3}
       propertyPath: m_RootOrder
       value: -1

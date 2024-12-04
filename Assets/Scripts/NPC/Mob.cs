@@ -10,6 +10,7 @@ using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 using Item = Inventory.Item;
+using Random = UnityEngine.Random;
 
 namespace NPC
 {
@@ -23,12 +24,13 @@ namespace NPC
     public abstract class Mob : AliveEntity
     {
         public GameObject spawnPoint;
-        public Dungeon _dungeon;
+        public Dungeon dungeon;
         public float damageModifier;
         public int level;
 
         [Header("Manual Set Parameters")]
         public bool isBoss;
+        public bool isFollowable;
         public Weapon weapon;
         [SerializeField] protected float baseHealth;
         [SerializeField] protected float baseDamage;
@@ -38,17 +40,17 @@ namespace NPC
         public float moveSpeed;
         public bool stopOnRangeAttack;
         [SerializeField] protected float attackRate;
-        [SerializeField] protected Animator _animator;
-        [SerializeField] private Transform _bodyTransform;
+        [SerializeField] protected Animator animator;
+        [SerializeField] private Transform bodyTransform;
         
         [Serializable]
         public class DropItem
         {
-            public Item Item;
-            public int MinCount;
-            public int MaxCount;
+            public Item item;
+            public int minCount;
+            public int maxCount;
             [Header("0 .. 100%")]
-            public int Chance;
+            public int chance;
         }
 
         public DropItem[] drop;
@@ -56,14 +58,12 @@ namespace NPC
         private Slider _healthSlider;
         private Image _healthSliderFill;
         
-        //[SerializeField] private TMP_ 
-        
-        protected Character Target;
+        public Character target;
         protected Transform TargetTransform;
-        protected bool _isMoving;
+        private bool _isMoving;
         [HideInInspector] public bool isAttacking;
         
-        private AttackType AttackType;
+        private AttackType _attackType;
         private Rigidbody _rigidbody;
 
         protected static int MeleeAttackAnimId = Animator.StringToHash("MeleeAttack");
@@ -72,8 +72,6 @@ namespace NPC
         
         protected virtual Action MeleeAttack => null;
         protected virtual Action RangeAttack => null;
-
-        //private Coroutine _followCoroutine;
 
         private void OnDestroy()
         {
@@ -90,13 +88,13 @@ namespace NPC
         private void OnTriggerEnter(Collider other)
         {
             Character character;
-            if (!(character = other.GetComponent<Character>()) || Target != null) return;
+            if (!(character = other.GetComponent<Character>()) || target != null) return;
 
-            Target = character;
-            TargetTransform = Target.partForRangeAttack.transform;
-            /*_followCoroutine = */StartCoroutine(FollowTarget());
+            target = character;
+            TargetTransform = target.partForRangeAttack.transform;
+            StartCoroutine(FollowTarget());
         }
-
+        
         private IEnumerator FollowTarget()
         {
             var deltaTime = Time.fixedDeltaTime;
@@ -105,9 +103,9 @@ namespace NPC
             float scanDelta = 0;
             float attackDelay = 0;
         
-            while (!isDead)
+            while (!isDead && target)
             {
-                if (Target.IsDead)
+                if (target.IsDead)
                     yield break;
 
                 while (isAttacking)
@@ -119,32 +117,27 @@ namespace NPC
                 var moveVector = targetPosition - Transform.position;
                 if (scanDelta >= delayMaxTime)
                 {
-                    var dest = TargetTransform.position - Transform.position;
                     var distance = moveVector.magnitude;
                     if (distance >= searchRadius)
                     {
                         StopMove();
                         Transform.position = spawnPoint.transform.position;
                         Health = maxHealth;
-                        Target = null;
+                        target = null;
                         yield break;
                     }
 
                     if (distance > closeRadius)
-                        AttackType = AttackType.Range;
+                        _attackType = AttackType.Range;
                     else if (distance <= closeRadius)
-                        AttackType = AttackType.Melee;
-                    //AttackType = distance <= closeRadius ? AttackType.Melee : AttackType.Range;
+                        _attackType = AttackType.Melee;
 
                     scanDelta = 0;
                 }
                 var lookPos = moveVector;
                 lookPos.y = 0;
                 var rotation = Quaternion.LookRotation(lookPos);
-                _bodyTransform.rotation = Quaternion.Slerp(Transform.rotation, rotation, deltaTime * 5);;
-                //_bodyTransform.LookAt(moveVector);
-                //var rotY = new Quaternion(0, Transform.rotation.y, 0, 0);
-                //Transform.rotation = rotY;
+                bodyTransform.rotation = Quaternion.Slerp(Transform.rotation, rotation, deltaTime * 5);;
 
                 moveVector.y = 0;
                 moveVector = moveVector.normalized;
@@ -160,12 +153,14 @@ namespace NPC
                 }
                 else
                 {
-                    if (AttackType == AttackType.Melee)
+                    if (_attackType == AttackType.Melee)
                     {
-                        _rigidbody.velocity = Vector3.zero;
+                        var hasMelee = MeleeAttack != null;
+                        if (hasMelee)
+                            _rigidbody.velocity = Vector3.zero;
                         if (attackDelay <= 0 && !isAttacking)
                         {
-                            if (MeleeAttack != null)
+                            if (hasMelee)
                             {
                                 MeleeAttack.Invoke();
                                 weapon.Attack();
@@ -182,36 +177,43 @@ namespace NPC
                         if (_isMoving)
                             StopMove();
                     }
-                    else if (AttackType == AttackType.Range)
+                    else if (_attackType == AttackType.Range)
                     {
                         if (RangeAttack != null && attackDelay <= 0 && !isAttacking)
                         {
                             RangeAttack.Invoke();
                             isAttacking = true;
                             attackDelay = attackRate;
-                            // if (stopOnRangeAttack)
-                            //     StopMove();
                         }
 
-                        //if (!stopOnRangeAttack && attackDelay <= 0)
-                        _rigidbody.velocity = moveVector * moveSpeed;
+                        if (isFollowable)
+                        {
+                            _rigidbody.velocity = moveVector * moveSpeed;
 
-                        if (!_isMoving)
-                            StartMove();
+                            if (!_isMoving)
+                                StartMove();
+                        }
                     }
                 }
 
                 yield return new WaitForNextFrameUnit();
             }
 
-            Target = null;
+            target = null;
         }
 
         public override void Die(AliveEntity killer = null)
         {
-            base.Die();
-            _dungeon.RegisterMobDeath(this);
-            
+            //base.Die();
+            dungeon.RegisterMobDeath(this);
+
+            // 50%
+            if (Random.Range(0, 100f) < 50)
+            {
+                var heart = Instantiate(GameGlobals.HealHeart, dungeon.Transform);
+                heart.Transform.position = bodyTransform.position + Vector3.up;
+            }
+
             Destroy(gameObject);
         }
 
@@ -249,17 +251,18 @@ namespace NPC
         {
             Transform = transform;
             _rigidbody = GetComponent<Rigidbody>();
-            if (!(_animator = GetComponent<Animator>()))
-                _animator = GetComponentInChildren<Animator>();
+            if (!(animator = GetComponent<Animator>()))
+                animator = GetComponentInChildren<Animator>();
             
-            if (!_bodyTransform)
-                _bodyTransform = Transform;
+            if (!bodyTransform)
+                bodyTransform = Transform;
             
             var modifier = Math.Max((level - 1) * 1.2f, 1);
-            damageModifier = modifier;
+            damageModifier = Math.Max((level - 1) * 1.05f, 1);//modifier;
             MaxHealth = baseHealth * modifier;
             Health = MaxHealth;
             IsDead = false;
+            isDamagable = true;
             
             var healthBarCanvas = Instantiate(GameGlobals.MobHealthBar, Transform);
             _healthSlider = healthBarCanvas.GetComponentInChildren<Slider>();
@@ -267,7 +270,7 @@ namespace NPC
             RegisterHealthChange(health);
             HealthChanged += RegisterHealthChange;
             
-            Transform.SetParent(_dungeon.Transform);
+            Transform.SetParent(dungeon.Transform);
         }
     }
 }

@@ -30,6 +30,7 @@ public class Character : AliveEntity
     public Player owner;
     public new Camera camera;
     public float damageModifier = 1;
+    public float attackRate;
     
     private static readonly int AttackId = Animator.StringToHash("Attack");
 
@@ -73,7 +74,7 @@ public class Character : AliveEntity
         clip.AddEvent(animEvent);
         
         // test
-        ApplyBuff(new RegenerationBuff(.25f, 5));
+        //ApplyBuff(new RegenerationBuff(.25f, 5));
     }
 
     private IEnumerator LateInitialization()
@@ -82,6 +83,12 @@ public class Character : AliveEntity
         MaxHealth = 100;
         Health = MaxHealth;
         StartCoroutine(TickBuffs());
+        HealthChanged += newHealth =>
+        {
+            if (newHealth <= 0)
+                Die();
+        };
+        isDamagable = true;
     }
     
     private void Start()
@@ -101,7 +108,7 @@ public class Character : AliveEntity
     public override void Die(AliveEntity killer = null)
     {
         IsDead = true;
-        if (owner.CurrentDungeon)
+        if (owner.currentDungeon)
         {
             Transform.position = dungeonDeathSpawnPoint.transform.position;
         }
@@ -109,7 +116,10 @@ public class Character : AliveEntity
         {
             Transform.position = deathSpawnPoint.transform.position;
         }
-        base.Die();
+        base.Die(killer);
+        
+        foreach (var buff in _buffs)
+            buff.OnDeactivate();
         _buffs.Clear();
         
         Health = MaxHealth;
@@ -129,7 +139,7 @@ public class Character : AliveEntity
         else
         {
             buff.Owner = this;
-            buff.RemainingTime = buff.MaxTime;
+            //buff.RemainingTime = buff.MaxTime;
             buff.Stacks = 1;
             _buffs.Add(buff);
             buff.OnActivate();
@@ -181,9 +191,6 @@ public class Character : AliveEntity
     public override bool ApplyDamage(DamageInfo damageInfo)
     {
         if (Health > 0 && !base.ApplyDamage(damageInfo)) return false;
-    
-        if (Health <= 0)
-            Die();
         
         return true;
     }
@@ -198,7 +205,8 @@ public class Character : AliveEntity
             {
                 currentWeapon.Attack();
                 _animator.SetTrigger(AttackId);
-                _attackDelay = currentWeapon.attackRate;
+                _attackDelay = attackRate;
+                //_attackDelay = currentWeapon.attackRate;
             }
         }
 
@@ -206,5 +214,15 @@ public class Character : AliveEntity
         {
             _animator.ResetTrigger(AttackId);
         }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        HealableObject heal;
+        if (!(heal = other.GetComponent<HealableObject>())) return;
+        
+        Health += heal.health * (1 + owner.level * 0.25f);
+        
+        Destroy(other.gameObject);
     }
 }

@@ -16,7 +16,7 @@ namespace Dungeons
             linkedDungeon.exitSpawnPoint = exitSpawnPoint;
             player.EnterDungeon(linkedDungeon);
             
-            player.Character.transform.position = linkedDungeon.GetEnterPosition();
+            player.character.transform.position = linkedDungeon.GetEnterPosition();
         }
     }
 }

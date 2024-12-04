@@ -8,6 +8,14 @@ namespace Weapons
     public class MeleeWeapon : Weapon
     {
         private DamageInfo _damageInfo;
+
+        private Collider _triggerCollider;
+        
+        private void Awake()
+        {
+            _triggerCollider = GetComponent<BoxCollider>();
+        }
+        
         public override void Attack(object[] _)
         {
             _damageInfo = new DamageInfo
@@ -39,6 +47,16 @@ namespace Weapons
                 
                 getter.ApplyDamage(_damageInfo);
             }
+        }
+    
+        public override void Enable()
+        {
+            _triggerCollider.enabled = true;
+        }
+
+        public override void Disable()
+        {
+            _triggerCollider.enabled = false;
         }
     }
 }

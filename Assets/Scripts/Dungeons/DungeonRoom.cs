@@ -52,8 +52,8 @@ namespace Dungeons
                     }
 
                     mob.spawnPoint = spawnPoint.gameObject;
-                    mob._dungeon = _dungeon;
-                    mob.level = Random.Range(_dungeon.MinLevel, _dungeon.MaxLevel);
+                    mob.dungeon = _dungeon;
+                    mob.level = Math.Max(Random.Range(_dungeon.MinLevel, _dungeon.MaxLevel), 1);
                     mob.Initialize();
                     
                     if (!mob.isBoss)

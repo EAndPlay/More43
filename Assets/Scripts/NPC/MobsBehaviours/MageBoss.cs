@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using UnityEngine;
 
@@ -8,9 +9,11 @@ namespace NPC.MobsBehaviours
     {
         private static readonly int IsMovingAnimId = Animator.StringToHash("IsMoving");
 
+        [SerializeField] private GameObject shield;
+        
         private void Start()
         {
-            var clip = _animator.runtimeAnimatorController.animationClips.First(x => x.name == "Attack01");
+            var clip = animator.runtimeAnimatorController.animationClips.First(x => x.name == "Attack01");
             
             var animEvent = new AnimationEvent
             {
@@ -20,8 +23,34 @@ namespace NPC.MobsBehaviours
             };
             
             clip.AddEvent(animEvent);
+            
+            shield.SetActive(false);
+
+            HealthChanged += OnHealthChange;
         }
 
+        private void OnHealthChange(float newHealth)
+        {
+            if (newHealth / maxHealth >= 0.5f) return;
+
+            Transform.localScale *= 1.2f;
+            StartCoroutine(StateChanging());
+            HealthChanged -= OnHealthChange;
+        }
+
+        private IEnumerator StateChanging()
+        {
+            while (!isDead)
+            {
+                shield.SetActive(true);
+                isDamagable = false;
+                yield return new WaitForSeconds(10);
+                shield.SetActive(false);
+                isDamagable = true;
+                yield return new WaitForSeconds(10);
+            }
+        }
+        
         private void RangeAttackAnimationEnded(string _)
         {
             isAttacking = false;
@@ -30,21 +59,21 @@ namespace NPC.MobsBehaviours
         
         protected override Action RangeAttack => () =>
         {
-            _animator.SetTrigger(RangeAttackAnimId);
+            animator.SetTrigger(RangeAttackAnimId);
         };
 
         protected override void StartMove()
         {
             base.StartMove();
             
-            _animator.SetBool(IsMovingAnimId, true);
+            animator.SetBool(IsMovingAnimId, true);
         }
 
         protected override void StopMove()
         {
             base.StopMove();
             
-            _animator.SetBool(IsMovingAnimId, false);
+            animator.SetBool(IsMovingAnimId, false);
         }
 
         public override bool ApplyDamage(DamageInfo damageInfo)
@@ -52,7 +81,7 @@ namespace NPC.MobsBehaviours
             if (!base.ApplyDamage(damageInfo)) return false;
             
             if (!isAttacking)
-                _animator.SetTrigger(GetDamageAnimId);
+                animator.SetTrigger(GetDamageAnimId);
             
             return true;
         }

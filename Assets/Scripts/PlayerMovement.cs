@@ -31,7 +31,8 @@ public class PlayerMovement : MonoBehaviour
         //rigidBody = GetComponent<Rigidbody>();
         _animator = GetComponent<Animator>();
     }
-    private static float _sqrt2 = (float)Math.Sqrt(2);
+
+    private const float Sqrt2 = 1.41421356237309504f;
 
     private void FixedUpdate()
     {
@@ -121,17 +122,17 @@ public class PlayerMovement : MonoBehaviour
         
         var calcSpeed = speed;
         if (xMove != 0 && yMove != 0)
-            calcSpeed /= _sqrt2;
+            calcSpeed /= Sqrt2;
         moveVector *= calcSpeed;
 
         //transform.Translate(moveVector * Time.deltaTime);
 
-        if ((xMove != 0 || yMove != 0) && Input.GetKeyDown(KeyCode.Space) && _dashDelay <= 0)
-        {
-            _dashDelay = 1;
-            rigidBody.position += moveVector * 20;
-            //rigidBody.velocity = new Vector3(moveVector.x, velocityCopy.y, moveVector.z) * 35;
-        }
+        // if ((xMove != 0 || yMove != 0) && Input.GetKeyDown(KeyCode.Space) && _dashDelay <= 0)
+        // {
+        //     _dashDelay = 1;
+        //     rigidBody.position += moveVector * 20;
+        //     //rigidBody.velocity = new Vector3(moveVector.x, velocityCopy.y, moveVector.z) * 35;
+        // }
         //_rigidBody.velocity += Vector3.up * jumpForce;
         //_rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange);
         
